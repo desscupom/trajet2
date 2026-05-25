@@ -27,13 +27,23 @@ jobs:
       - name: Instalar dependências
         run: npm install --legacy-peer-deps
 
+      - name: Criar arquivo .env com as chaves
+        run: |
+          cat > .env << ENVEOF
+          EXPO_PUBLIC_SUPABASE_URL=${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          EXPO_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+          EXPO_PUBLIC_PEXELS_API_KEY=${{ secrets.EXPO_PUBLIC_PEXELS_API_KEY }}
+          EXPO_PUBLIC_OPENAI_API_KEY=${{ secrets.EXPO_PUBLIC_OPENAI_API_KEY }}
+          EXPO_PUBLIC_USE_EDGE_FUNCTION=${{ secrets.EXPO_PUBLIC_USE_EDGE_FUNCTION }}
+          ENVEOF
+
       - name: Setup EAS CLI
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Prebuild iOS (gera pasta ios/ com Podfile correto)
+      - name: Prebuild iOS
         run: npx expo prebuild --platform ios --no-install
 
       - name: Garantir JSC no Podfile.properties.json
@@ -42,26 +52,21 @@ jobs:
             const fs = require('fs');
             const p = JSON.parse(fs.readFileSync('ios/Podfile.properties.json'));
             p['expo.jsEngine'] = 'jsc';
-            p['newArchEnabled'] = 'false';
             fs.writeFileSync('ios/Podfile.properties.json', JSON.stringify(p, null, 2));
             console.log('Podfile.properties.json:', JSON.stringify(p, null, 2));
           "
 
-      - name: Confirma que Hermes está desativado
-        run: |
-          echo "=== Linha hermes_enabled no Podfile ==="
-          grep "hermes_enabled" ios/Podfile
+      - name: Confirma hermes desativado
+        run: grep "hermes_enabled" ios/Podfile
 
       - name: Instalar CocoaPods
-        run: |
-          cd ios
-          pod install --repo-update
-          cd ..
+        run: cd ios && pod install --repo-update && cd ..
 
-      - name: Build e Upload para App Store Connect
+      - name: Build iOS via EAS
         run: eas build --platform ios --profile production --non-interactive --clear-cache
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EAS_NO_VCS: 1
 
       - name: Submit para App Store Connect
         if: ${{ inputs.submit == 'true' }}
