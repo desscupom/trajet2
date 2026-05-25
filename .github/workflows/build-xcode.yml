@@ -27,7 +27,7 @@ jobs:
       - name: Instalar dependências
         run: npm install --legacy-peer-deps
 
-      - name: Criar arquivo .env com as chaves
+      - name: Criar .env com as chaves
         run: |
           cat > .env << ENVEOF
           EXPO_PUBLIC_SUPABASE_URL=${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
@@ -43,20 +43,21 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Prebuild iOS
+      - name: Prebuild iOS (New Arch + JSC)
         run: npx expo prebuild --platform ios --no-install
 
-      - name: Garantir JSC no Podfile.properties.json
+      - name: Forçar JSC no Podfile.properties.json
         run: |
           node -e "
             const fs = require('fs');
             const p = JSON.parse(fs.readFileSync('ios/Podfile.properties.json'));
             p['expo.jsEngine'] = 'jsc';
+            p['newArchEnabled'] = 'true';
             fs.writeFileSync('ios/Podfile.properties.json', JSON.stringify(p, null, 2));
-            console.log('Podfile.properties.json:', JSON.stringify(p, null, 2));
+            console.log('Config:', JSON.stringify(p, null, 2));
           "
 
-      - name: Confirma hermes desativado
+      - name: Confirma hermes=false no Podfile
         run: grep "hermes_enabled" ios/Podfile
 
       - name: Instalar CocoaPods
