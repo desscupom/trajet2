@@ -1,0 +1,19 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["__TEAM_ID__.com.trajet.app"],
+        "components": [
+          {
+            "/": "/p/*",
+            "comment": "Visualização pública de viagem compartilhada"
+          },
+          {
+            "/": "/invite/*",
+            "comment": "Convite pra entrar numa viagem"
+          }
+        ]
+      }
+    ]
+  }
+}

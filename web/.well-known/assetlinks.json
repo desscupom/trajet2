@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.trajet.mobile",
+      "sha256_cert_fingerprints": [
+        "11:76:5B:0A:A4:96:DB:34:92:3F:08:EE:5D:C0:11:2F:0A:FA:5E:E3:61:A7:EF:7C:A0:C3:C6:56:DE:20:11:1C"
+      ]
+    }
+  }
+]

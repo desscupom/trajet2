@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "900373236619",
+    "project_id": "trajet-496522",
+    "storage_bucket": "trajet-496522.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:900373236619:android:0000000000000000",
+        "android_client_info": {
+          "package_name": "com.trajet.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "900373236619-dp2lftovh0r76ja67u4f4ct88k673hhj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.trajet.mobile",
+            "certificate_hash": "80F6BE120D53D6D64F6DB0DD547A3DFB8A80FF1F"
+          }
+        },
+        {
+          "client_id": "900373236619-93bl5fchlei8ggogf6jct9fmci7uta5g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "placeholder"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "900373236619-93bl5fchlei8ggogf6jct9fmci7uta5g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

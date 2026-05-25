@@ -1,0 +1,19 @@
+
+INSTRUÇÃO MANUAL PARA ATIVAR JSC (se o EAS continuar ignorando):
+
+1. Rode: npx expo prebuild --platform ios --clean
+   Isso gera a pasta ios/ com o Podfile
+
+2. No arquivo ios/Podfile, encontre a linha:
+   :hermes_enabled => podfile_properties['expo.jsEngine'] == nil || podfile_properties['expo.jsEngine'] == 'hermes',
+   
+   E mude para:
+   :hermes_enabled => false,
+
+3. Rode: cd ios && pod install
+   
+4. Abra o Xcode: open ios/Trajet.xcworkspace
+   
+5. No Xcode: Product > Archive > Distribute App > App Store Connect
+
+Isso bypassa o EAS completamente e garante JSC no binário final.

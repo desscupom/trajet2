@@ -1,0 +1,162 @@
+{
+  "expo": {
+    "name": "Trajet",
+    "slug": "trajet",
+    "version": "1.7.8",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "trajet",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0a0e1a"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.trajet.mobile",
+      "associatedDomains": [
+        "applinks:trajet.app"
+      ],
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "O Trajet usa sua localização para sugerir lugares próximos e disparar lembretes quando você chegar a um destino.",
+        "NSCameraUsageDescription": "O Trajet usa a câmera para você adicionar uma foto de perfil.",
+        "NSPhotoLibraryUsageDescription": "O Trajet acessa suas fotos para você escolher uma foto de perfil ou capa de viagem.",
+        "NSCalendarsUsageDescription": "O Trajet pode salvar suas viagens e lembretes no calendário do dispositivo.",
+        "NSUserNotificationUsageDescription": "O Trajet envia lembretes de tarefas e check-in de hospedagem.",
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "trajet",
+              "com.googleusercontent.apps.900373236619-nfsl0o3lq4legie6a72ca6vdi4ib2183"
+            ]
+          }
+        ]
+      },
+      "buildNumber": "82",
+      "requireFullScreen": false,
+      "usesAppleSignIn": true,
+      "entitlements": {
+        "com.apple.security.cs.allow-jit": true
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0a0e1a"
+      },
+      "package": "com.trajet.mobile",
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "RECEIVE_BOOT_COMPLETED",
+        "VIBRATE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "trajet.app",
+              "pathPrefix": "/p"
+            },
+            {
+              "scheme": "https",
+              "host": "trajet.app",
+              "pathPrefix": "/invite"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "autoVerify": false,
+          "data": [
+            {
+              "scheme": "trajet",
+              "host": "auth"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
+      "versionCode": 85,
+      "minSdkVersion": 24,
+      "targetSdkVersion": 34,
+      "navigationBar": {
+        "backgroundColor": "#0a0e1a",
+        "barStyle": "light-content"
+      },
+      "softwareKeyboardLayoutMode": "pan"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "O Trajet usa sua localização para sugerir lugares próximos."
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "O Trajet precisa acessar seu calendário para salvar viagens.",
+          "remindersPermission": "O Trajet precisa acessar seus lembretes para criar alertas de viagem."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/adaptive-icon.png",
+          "color": "#0a0e1a",
+          "defaultChannel": "default",
+          "sounds": []
+        }
+      ],
+      "expo-image-picker",
+      "expo-apple-authentication",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "O Trajet precisa salvar o storie de check-in na sua galeria.",
+          "savePhotosPermission": "O Trajet precisa salvar imagens na sua galeria."
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "jsEngine": "jsc"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "e60c2f4c-cec4-40ec-a3e9-c80beb822666"
+      }
+    },
+    "jsEngine": "jsc"
+  }
+}

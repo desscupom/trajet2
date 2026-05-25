@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Roteiro de viagem — Trajet</title>
+
+<!-- Open Graph / Social preview -->
+<meta property="og:title" content="Roteiro de viagem" id="og-title">
+<meta property="og:description" content="Roteiro compartilhado via Trajet" id="og-description">
+<meta property="og:type" content="website">
+<meta property="og:image" content="" id="og-image">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Roteiro de viagem" id="tw-title">
+<meta name="twitter:description" content="" id="tw-description">
+<meta name="twitter:image" content="" id="tw-image">
+
+<!-- Theme color (Android/iOS browser chrome) -->
+<meta name="theme-color" content="#0d9488">
+
+<!-- Favicon (data URI inline pra não precisar arquivo separado) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E✈️%3C/text%3E%3C/svg%3E">
+
+<!-- Config externa -->
+<script src="config.js"></script>
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #0d9488;
+    --primary-dark: #0f766e;
+    --bg: #fafbfc;
+    --surface: #ffffff;
+    --text: #0f172a;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --border-subtle: #f1f5f9;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.5;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 0 80px;
+  }
+
+  /* === STATES === */
+  .state {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px;
+    text-align: center;
+  }
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .state-title {
+    margin-top: 16px;
+    font-size: 18px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .state-error-icon {
+    font-size: 56px;
+    margin-bottom: 8px;
+  }
+  .state-error-message {
+    color: var(--text-muted);
+    margin-top: 8px;
+    max-width: 400px;
+    line-height: 1.5;
+  }
+
+  /* === HERO === */
+  .hero {
+    position: relative;
+    height: 320px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  }
+  .hero-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+      rgba(0,0,0,0.75) 0%,
+      rgba(0,0,0,0.35) 50%,
+      rgba(0,0,0,0) 80%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 32px 24px;
+    color: #fff;
+  }
+  .hero-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    opacity: 0.9;
+    margin-bottom: 10px;
+  }
+  .hero-title {
+    font-size: clamp(28px, 6vw, 36px);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .hero-dates {
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0.95;
+  }
+
+  /* === HERO TEXT (no image) === */
+  .hero-text {
+    padding: 72px 24px 40px;
+    text-align: center;
+    background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-text .hero-label { color: var(--text-muted); }
+  .hero-text .hero-title {
+    color: var(--text);
+    margin-top: 8px;
+  }
+  .hero-text .hero-dates { color: var(--text-muted); }
+
+  /* === DESCRIÇÃO === */
+  .description {
+    padding: 24px 24px 0;
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* === SECTIONS === */
+  .section { padding: 32px 24px 0; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .section-accent {
+    width: 4px;
+    height: 22px;
+    background: var(--primary);
+    border-radius: 2px;
+  }
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+  }
+  .section-count {
+    margin-left: 4px;
+    color: var(--text-muted);
+    font-size: 11px;
+    background: var(--border-subtle);
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+  }
+
+  /* === LODGING CARDS === */
+  .lodging {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .lodging:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+  .lodging-name { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+  .lodging-address { color: var(--text-muted); font-size: 14px; margin-bottom: 8px; }
+  .lodging-dates {
+    color: var(--primary);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* === DAY BLOCKS === */
+  .day {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 12px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .day:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+  .day-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: 12px;
+  }
+  .day-number {
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
+  .day-date {
+    color: var(--text);
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: capitalize;
+  }
+  .item {
+    display: flex;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px dotted var(--border);
+  }
+  .item:last-child { border-bottom: none; padding-bottom: 0; }
+  .item-time {
+    width: 55px;
+    color: var(--text-muted);
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .item-content { flex: 1; min-width: 0; }
+  .item-name { color: var(--text); font-weight: 600; font-size: 15px; }
+  .item-address, .item-notes {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 3px;
+  }
+  .item-notes { font-style: italic; }
+  .empty-day {
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  /* === CTA OPEN APP === */
+  .cta-app {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: #fff;
+    border-radius: 14px;
+    padding: 20px 24px;
+    margin: 32px 24px 0;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 6px 20px rgba(13, 148, 136, 0.25);
+  }
+  .cta-app:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(13, 148, 136, 0.4);
+  }
+  .cta-icon { font-size: 22px; }
+  .cta-text { text-align: left; }
+  .cta-title { font-weight: 700; font-size: 16px; margin-bottom: 2px; }
+  .cta-hint { font-size: 12px; opacity: 0.9; }
+
+  /* === FOOTER === */
+  .footer {
+    margin-top: 48px;
+    padding: 24px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+  .footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<div id="loading" class="state">
+  <div class="spinner"></div>
+  <div class="state-title">Carregando viagem…</div>
+</div>
+
+<div id="error" class="state" style="display:none">
+  <div class="state-error-icon">⚠️</div>
+  <h1 class="state-title" id="error-title">Erro ao carregar</h1>
+  <p class="state-error-message" id="error-message"></p>
+</div>
+
+<div id="content" class="container" style="display:none">
+  <div id="hero"></div>
+  <div id="description" class="description" style="display:none"></div>
+
+  <a id="cta-app" class="cta-app" href="#" style="display:none">
+    <span class="cta-icon">✈️</span>
+    <div class="cta-text">
+      <div class="cta-title">Abrir no Trajet</div>
+      <div class="cta-hint">Visualize no aplicativo</div>
+    </div>
+  </a>
+
+  <section id="lodgings-section" class="section" style="display:none">
+    <div class="section-header">
+      <div class="section-accent"></div>
+      <span class="section-title">Hospedagens</span>
+      <span id="lodgings-count" class="section-count"></span>
+    </div>
+    <div id="lodgings"></div>
+  </section>
+
+  <section id="itinerary-section" class="section" style="display:none">
+    <div class="section-header">
+      <div class="section-accent"></div>
+      <span class="section-title">Roteiro</span>
+      <span id="itinerary-count" class="section-count"></span>
+    </div>
+    <div id="itinerary"></div>
+  </section>
+
+  <div class="footer">
+    Compartilhado via <strong id="footer-app-name">Trajet</strong>
+  </div>
+</div>
+
+<script>
+  const CFG = window.TRAJET_CONFIG;
+
+  function escapeHtml(s) {
+    if (s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function formatDateBR(iso) {
+    if (!iso) return '';
+    const part = iso.split('T')[0];
+    const [y, m, d] = part.split('-');
+    return `${d}/${m}/${y}`;
+  }
+
+  function formatDateLongBR(iso) {
+    if (!iso) return '';
+    const part = iso.split('T')[0];
+    const [y, m, d] = part.split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    const days = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+    const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+                    'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+    return `${days[date.getDay()]}, ${d} de ${months[m - 1]} de ${y}`;
+  }
+
+  function formatDateRange(start, end) {
+    if (start && end) return `${formatDateBR(start)} → ${formatDateBR(end)}`;
+    if (start) return `A partir de ${formatDateBR(start)}`;
+    return 'Sem datas definidas';
+  }
+
+  function getToken() {
+    const url = new URL(window.location.href);
+    const fromQuery = url.searchParams.get('token');
+    if (fromQuery) return fromQuery;
+    const parts = url.pathname.split('/').filter(Boolean);
+    const last = parts[parts.length - 1];
+    if (last && last.length >= 16 && last !== 'index.html') return last;
+    return null;
+  }
+
+  function showError(title, message) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error').style.display = 'flex';
+    document.getElementById('error-title').textContent = title;
+    document.getElementById('error-message').textContent = message || '';
+  }
+
+  function isMobile() {
+    return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  }
+
+  function setMeta(idSelector, value) {
+    const el = document.getElementById(idSelector);
+    if (el && value) el.setAttribute('content', value);
+  }
+
+  async function loadTrip() {
+    const token = getToken();
+    if (!token) {
+      showError('Link inválido', 'O link não contém token de viagem.');
+      return;
+    }
+
+    document.getElementById('footer-app-name').textContent = CFG.APP_NAME;
+
+    const ctaUrl = CFG.APP_SCHEME + token;
+    const cta = document.getElementById('cta-app');
+    cta.href = ctaUrl;
+    if (isMobile()) cta.style.display = 'flex';
+
+    try {
+      const res = await fetch(
+        `${CFG.SUPABASE_URL}/functions/v1/public-trip?token=${encodeURIComponent(token)}`,
+      );
+
+      if (!res.ok) {
+        let errBody = {};
+        try { errBody = await res.json(); } catch {}
+        if (res.status === 404) showError('Link não encontrado', 'Este link não existe ou foi removido.');
+        else if (res.status === 410) showError('Link inválido', errBody.error || 'Este link expirou ou foi revogado.');
+        else showError('Erro', errBody.error || `Erro ${res.status}`);
+        return;
+      }
+
+      const data = await res.json();
+      render(data);
+    } catch (err) {
+      console.error(err);
+      showError('Erro de rede', 'Não consegui carregar a viagem. Tente de novo mais tarde.');
+    }
+  }
+
+  function render(data) {
+    const { trip, days, items, lodgings, share } = data;
+
+    // Update meta tags pra preview de social media
+    const ogTitle = `${trip.title} — ${CFG.APP_NAME}`;
+    const ogDesc = trip.description || formatDateRange(trip.start_date, trip.end_date);
+    document.title = ogTitle;
+    setMeta('og-title', ogTitle);
+    setMeta('og-description', ogDesc);
+    setMeta('tw-title', ogTitle);
+    setMeta('tw-description', ogDesc);
+    if (trip.cover_image_url) {
+      setMeta('og-image', trip.cover_image_url);
+      setMeta('tw-image', trip.cover_image_url);
+    }
+
+    // Hero
+    const heroDiv = document.getElementById('hero');
+    if (trip.cover_image_url) {
+      heroDiv.innerHTML = `
+        <div class="hero">
+          <img src="${escapeHtml(trip.cover_image_url)}" class="hero-image" alt="" />
+          <div class="hero-overlay">
+            <div class="hero-label">Roteiro de viagem</div>
+            <h1 class="hero-title">${escapeHtml(trip.title)}</h1>
+            <div class="hero-dates">${escapeHtml(formatDateRange(trip.start_date, trip.end_date))}</div>
+          </div>
+        </div>`;
+    } else {
+      heroDiv.innerHTML = `
+        <div class="hero-text">
+          <div class="hero-label">Roteiro de viagem</div>
+          <h1 class="hero-title">${escapeHtml(trip.title)}</h1>
+          <div class="hero-dates">${escapeHtml(formatDateRange(trip.start_date, trip.end_date))}</div>
+        </div>`;
+    }
+
+    if (trip.description) {
+      const d = document.getElementById('description');
+      d.textContent = trip.description;
+      d.style.display = 'block';
+    }
+
+    // Hospedagens
+    if (share.includeLodgings && lodgings && lodgings.length > 0) {
+      const sorted = [...lodgings].sort((a, b) => {
+        if (!a.check_in_at) return 1;
+        if (!b.check_in_at) return -1;
+        return a.check_in_at.localeCompare(b.check_in_at);
+      });
+
+      document.getElementById('lodgings-section').style.display = 'block';
+      document.getElementById('lodgings-count').textContent = String(sorted.length);
+
+      const html = sorted.map(l => `
+        <div class="lodging">
+          <div class="lodging-name">${escapeHtml(l.name)}</div>
+          ${l.address ? `<div class="lodging-address">${escapeHtml(l.address)}</div>` : ''}
+          ${l.check_in_at && l.check_out_at
+            ? `<div class="lodging-dates">${formatDateBR(l.check_in_at)} → ${formatDateBR(l.check_out_at)}</div>`
+            : ''}
+        </div>
+      `).join('');
+      document.getElementById('lodgings').innerHTML = html;
+    }
+
+    // Roteiro
+    if (days && days.length > 0) {
+      document.getElementById('itinerary-section').style.display = 'block';
+      document.getElementById('itinerary-count').textContent = String(days.length);
+
+      const sortedDays = [...days].sort((a, b) => a.day_date.localeCompare(b.day_date));
+
+      const html = sortedDays.map((day, idx) => {
+        const dayItems = items
+          .filter(i => i.trip_day_id === day.id)
+          .sort((a, b) => {
+            if (a.start_time && b.start_time) return a.start_time.localeCompare(b.start_time);
+            return (a.position || 0) - (b.position || 0);
+          });
+
+        const itemsHtml = dayItems.length === 0
+          ? `<div class="empty-day">Sem lugares planejados</div>`
+          : dayItems.map(i => `
+              <div class="item">
+                <div class="item-time">${escapeHtml(i.start_time || '—')}</div>
+                <div class="item-content">
+                  <div class="item-name">${escapeHtml((i.place && i.place.name) || i.custom_title || 'Sem nome')}</div>
+                  ${i.place && i.place.address ? `<div class="item-address">📍 ${escapeHtml(i.place.address)}</div>` : ''}
+                  ${i.notes ? `<div class="item-notes">${escapeHtml(i.notes)}</div>` : ''}
+                </div>
+              </div>
+            `).join('');
+
+        return `
+          <div class="day">
+            <div class="day-header">
+              <span class="day-number">DIA ${idx + 1}</span>
+              <span class="day-date">${escapeHtml(formatDateLongBR(day.day_date))}</span>
+            </div>
+            ${itemsHtml}
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('itinerary').innerHTML = html;
+    }
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  }
+
+  loadTrip();
+</script>
+</body>
+</html>

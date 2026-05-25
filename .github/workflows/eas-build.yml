@@ -1,0 +1,64 @@
+name: EAS Build
+
+on:
+  # Dispara automaticamente ao fazer push na main
+  push:
+    branches:
+      - main
+
+  # Também permite disparar manualmente pelo GitHub (sem precisar de terminal)
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Plataforma para buildar'
+        required: true
+        default: 'ios'
+        type: choice
+        options:
+          - ios
+          - android
+          - all
+      submit:
+        description: 'Submeter para a loja após build?'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build:
+    name: EAS Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Setup EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build iOS
+        if: ${{ github.event_name == 'push' || inputs.platform == 'ios' || inputs.platform == 'all' }}
+        run: eas build --platform ios --profile production --non-interactive
+
+      - name: Build Android
+        if: ${{ inputs.platform == 'android' || inputs.platform == 'all' }}
+        run: eas build --platform android --profile production --non-interactive
+
+      - name: Submit iOS para App Store
+        if: ${{ inputs.submit == 'true' && (inputs.platform == 'ios' || inputs.platform == 'all') }}
+        run: eas submit --platform ios --latest --non-interactive
+
+      - name: Submit Android para Google Play
+        if: ${{ inputs.submit == 'true' && (inputs.platform == 'android' || inputs.platform == 'all') }}
+        run: eas submit --platform android --latest --non-interactive

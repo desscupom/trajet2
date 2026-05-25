@@ -1,0 +1,112 @@
+-- =========================================================
+-- Triggers pra disparar push remoto de atividade da viagem
+-- =========================================================
+--
+-- ATENÇÃO: Esta migration está COMENTADA por padrão.
+--
+-- Pré-requisitos pra ativar:
+--   1) Você deployou a edge function: supabase functions deploy send-push-on-activity
+--   2) A extensão pg_net está habilitada no seu projeto Supabase
+--      (Database → Extensions → pg_net) — usada pra fazer HTTP do Postgres
+--   3) Você fez EAS Build do app (Expo Go não recebe push remoto)
+--
+-- Pra ativar:
+--   - Descomente o bloco abaixo
+--   - Substitua YOUR_PROJECT_REF pelo seu (ex: sakwdwdqsswblwqjtqth)
+--   - Aplique via: supabase migration up
+--
+-- =========================================================
+
+-- /*
+-- create extension if not exists pg_net with schema extensions;
+
+-- -- Helper: chama a edge function send-push-on-activity
+-- create or replace function public.notify_trip_activity(
+--   _trip_id uuid,
+--   _actor_id uuid,
+--   _type text,
+--   _title text,
+--   _body text
+-- ) returns void
+-- language plpgsql
+-- security definer
+-- set search_path = public
+-- as $$
+-- declare
+--   _function_url text := 'https://YOUR_PROJECT_REF.supabase.co/functions/v1/send-push-on-activity';
+-- begin
+--   perform extensions.http_post(
+--     url := _function_url,
+--     headers := '{"Content-Type": "application/json"}'::jsonb,
+--     body := jsonb_build_object(
+--       'trip_id', _trip_id,
+--       'actor_id', _actor_id,
+--       'type', _type,
+--       'title', _title,
+--       'body', _body
+--     )::text
+--   );
+-- end;
+-- $$;
+
+-- -- Trigger: novo lugar
+-- create or replace function public.trg_places_after_insert() returns trigger
+-- language plpgsql security definer set search_path = public as $$
+-- declare _author_name text;
+-- begin
+--   if new.created_by is null then return new; end if;
+--   select coalesce(split_part(full_name, ' ', 1), email, 'Alguém')
+--     into _author_name
+--     from public.profiles where id = new.created_by;
+--   perform public.notify_trip_activity(
+--     new.trip_id, new.created_by, 'trip_edits',
+--     'Novidade na viagem',
+--     _author_name || ' adicionou “' || new.name || '”'
+--   );
+--   return new;
+-- end;
+-- $$;
+-- drop trigger if exists places_push_trigger on public.places;
+-- create trigger places_push_trigger after insert on public.places
+--   for each row execute function public.trg_places_after_insert();
+
+-- -- Trigger: nova despesa
+-- create or replace function public.trg_expenses_after_insert() returns trigger
+-- language plpgsql security definer set search_path = public as $$
+-- declare _author_name text;
+-- begin
+--   select coalesce(split_part(full_name, ' ', 1), email, 'Alguém')
+--     into _author_name
+--     from public.profiles where id = new.paid_by;
+--   perform public.notify_trip_activity(
+--     new.trip_id, new.paid_by, 'expense_added',
+--     'Nova despesa',
+--     _author_name || ' adicionou “' || new.description || '”'
+--   );
+--   return new;
+-- end;
+-- $$;
+-- drop trigger if exists expenses_push_trigger on public.expenses;
+-- create trigger expenses_push_trigger after insert on public.expenses
+--   for each row execute function public.trg_expenses_after_insert();
+
+-- -- Trigger: novo membro
+-- create or replace function public.trg_trip_members_after_insert() returns trigger
+-- language plpgsql security definer set search_path = public as $$
+-- declare _author_name text;
+-- begin
+--   select coalesce(split_part(full_name, ' ', 1), email, 'Alguém')
+--     into _author_name
+--     from public.profiles where id = new.profile_id;
+--   perform public.notify_trip_activity(
+--     new.trip_id, new.profile_id, 'member_joined',
+--     'Novo membro',
+--     _author_name || ' entrou na viagem'
+--   );
+--   return new;
+-- end;
+-- $$;
+-- drop trigger if exists trip_members_push_trigger on public.trip_members;
+-- create trigger trip_members_push_trigger after insert on public.trip_members
+--   for each row execute function public.trg_trip_members_after_insert();
+-- */

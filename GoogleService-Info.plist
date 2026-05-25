@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CLIENT_ID</key>
+  <string>900373236619-nfsl0o3lq4legie6a72ca6vdi4ib2183.apps.googleusercontent.com</string>
+  <key>REVERSED_CLIENT_ID</key>
+  <string>com.googleusercontent.apps.900373236619-nfsl0o3lq4legie6a72ca6vdi4ib2183</string>
+  <key>BUNDLE_ID</key>
+  <string>com.trajet.mobile</string>
+  <key>PROJECT_ID</key>
+  <string>trajet-496522</string>
+  <key>STORAGE_BUCKET</key>
+  <string>trajet-496522.appspot.com</string>
+  <key>GCM_SENDER_ID</key>
+  <string>900373236619</string>
+  <key>GOOGLE_APP_ID</key>
+  <string>1:900373236619:ios:trajet</string>
+</dict>
+</plist>
