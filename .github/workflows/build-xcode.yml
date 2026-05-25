@@ -71,6 +71,11 @@ jobs:
 
       - name: Submit para App Store Connect
         if: ${{ inputs.submit == 'true' }}
-        run: eas submit --platform ios --latest --non-interactive
+        run: |
+          eas submit --platform ios --latest --non-interactive \
+            --apple-id=${{ secrets.APPLE_ID }} \
+            --asc-app-id=${{ secrets.ASC_APP_ID }} \
+            --apple-team-id=${{ secrets.APPLE_TEAM_ID }}
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          EXPO_APPLE_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
