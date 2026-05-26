@@ -43,6 +43,12 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Criar projeto no EAS se não existir
+        run: |
+          npx eas-cli project:info || npx eas-cli project:init --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
       - name: Prebuild iOS
         run: npx expo prebuild --platform ios --no-install
 
@@ -63,17 +69,14 @@ jobs:
       - name: Instalar CocoaPods
         run: cd ios && pod install --repo-update && cd ..
 
-      - name: Build iOS via EAS (compila no servidor EAS usando o código local)
-        run: eas build --platform ios --profile production --non-interactive --clear-cache --local
+      - name: Build iOS via EAS
+        run: eas build --platform ios --profile production --non-interactive --clear-cache
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Submit para App Store Connect via EAS (gratuito, sem limite)
+      - name: Submit para App Store Connect
         if: ${{ inputs.submit == 'true' }}
         run: eas submit --platform ios --latest --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          EAS_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          EAS_APPLE_ID: ${{ secrets.APPLE_ID }}
-          EAS_APPLE_ASC_APP_ID: ${{ secrets.ASC_APP_ID }}

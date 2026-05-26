@@ -153,9 +153,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "eas": {
-        "projectId": "9795d53c-bf18-47f8-bbcf-ce976a7938bc"
-      }
+      "eas": {}
     },
     "jsEngine": "jsc",
     "owner": "oonlinemkt"
