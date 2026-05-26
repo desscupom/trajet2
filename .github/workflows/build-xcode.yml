@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-ios:
-    name: Build iOS no macOS
+    name: Build e Submit iOS
     runs-on: macos-latest
 
     steps:
@@ -43,7 +43,7 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Prebuild iOS (New Arch + JSC)
+      - name: Prebuild iOS
         run: npx expo prebuild --platform ios --no-install
 
       - name: Forçar JSC no Podfile.properties.json
@@ -57,25 +57,23 @@ jobs:
             console.log('Config:', JSON.stringify(p, null, 2));
           "
 
-      - name: Confirma hermes=false no Podfile
+      - name: Confirma hermes=false
         run: grep "hermes_enabled" ios/Podfile
 
       - name: Instalar CocoaPods
         run: cd ios && pod install --repo-update && cd ..
 
-      - name: Build iOS via EAS
-        run: eas build --platform ios --profile production --non-interactive --clear-cache
+      - name: Build iOS via EAS (compila no servidor EAS usando o código local)
+        run: eas build --platform ios --profile production --non-interactive --clear-cache --local
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          EAS_NO_VCS: 1
 
-      - name: Submit para App Store Connect
+      - name: Submit para App Store Connect via EAS (gratuito, sem limite)
         if: ${{ inputs.submit == 'true' }}
-        run: |
-          eas submit --platform ios --latest --non-interactive \
-            --apple-id=${{ secrets.APPLE_ID }} \
-            --asc-app-id=${{ secrets.ASC_APP_ID }} \
-            --apple-team-id=${{ secrets.APPLE_TEAM_ID }}
+        run: eas submit --platform ios --latest --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          EXPO_APPLE_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          EAS_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          EAS_APPLE_ID: ${{ secrets.APPLE_ID }}
+          EAS_APPLE_ASC_APP_ID: ${{ secrets.ASC_APP_ID }}
