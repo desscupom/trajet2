@@ -153,9 +153,11 @@
       "typedRoutes": true
     },
     "extra": {
-      "eas": {}
+      "eas": {
+        "projectId": "9795d53c-bf18-47f8-bbcf-ce976a7938bc"
+      }
     },
     "jsEngine": "jsc",
-    "owner": "oonlinemkt"
+    "owner": "andpfjr4"
   }
 }
