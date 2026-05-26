@@ -154,9 +154,10 @@
     },
     "extra": {
       "eas": {
-        "projectId": "e60c2f4c-cec4-40ec-a3e9-c80beb822666"
+        "projectId": "9795d53c-bf18-47f8-bbcf-ce976a7938bc"
       }
     },
-    "jsEngine": "jsc"
+    "jsEngine": "jsc",
+    "owner": "oonlinemkt"
   }
 }
